@@ -41,7 +41,6 @@ RUN apt-get clean
 WORKDIR ${WORKSPACE_ROOT}/src
 
 RUN git clone https://github.com/KalanaRatnayake/yolo_ros.git
-RUN git clone https://github.com/KalanaRatnayake/detection_msgs.git
 
 RUN pip3 install --no-cache-dir -r ${WORKSPACE_ROOT}/src/yolo_ros/requirements.txt
 

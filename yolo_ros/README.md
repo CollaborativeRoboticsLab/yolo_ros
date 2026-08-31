@@ -64,7 +64,6 @@ Clone this repository with and install dependencies.
 
 ```bash
 git clone https://github.com/KalanaRatnayake/yolo_ros.git
-git clone https://github.com/KalanaRatnayake/detection_msgs.git
 cd yolo_ros
 pip3 install -r requirements.txt
 ```
@@ -99,7 +98,7 @@ ros2 launch yolo_ros yolo.launch.py
 | rgb_topic               | RGB_TOPIC               | `/yolo_ros/rgb_image`       | Topic for publishing synchronized rgb images. uses `sensor_msgs/Image` |
 | depth_topic             | DEPTH_TOPIC             | `/yolo_ros/depth_image`     | Topic for publishing synchronized depth images. uses `sensor_msgs/PointCloud2` |
 | annotated_topic         | ANNOTATED_TOPIC         | `/yolo_ros/annotated_image` | Topic for publishing annotated images uses `sensor_msgs/Image` |
-| detailed_topic          | DETAILED_TOPIC          | `/yolo_ros/detection_result`| Topic for publishing detailed results uses `detection_msgs/Detections` |
+| detailed_topic          | DETAILED_TOPIC          | `/yolo_ros/detection_result`| Topic for publishing detailed results uses `yolo_ros_msgs/Detections` |
 | threshold               | THRESHOLD               | `0.25`                      | Confidence threshold for predictions |
 | device                  | DEVICE                  | `'0'`                       | `cpu` for CPU, `0` for gpu, `0,1,2,3` if there are multiple GPUs |
 

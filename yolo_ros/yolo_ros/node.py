@@ -8,7 +8,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 
 from sensor_msgs.msg import Image, PointCloud2
-from detection_msgs.msg import Detections
+from yolo_ros_msgs.msg import Detections
 
 from cv_bridge import CvBridge
 
