@@ -9,8 +9,13 @@ find_package(ament_cmake REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
+set(srv_files
+  "srv/GetLatestDetections.srv"
+)
+
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Detections.msg"
+  ${srv_files}
   DEPENDENCIES std_msgs
 )
 

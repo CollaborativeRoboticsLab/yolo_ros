@@ -1,0 +1,15 @@
+# Empty request: return the latest cached 2D detections.
+---
+std_msgs/Header header
+string[] full_class_list
+bool detections
+int64[] detection_ids
+int16[] class_id
+string[] class_name
+float64[] confidence
+int16[] bbx_center_x
+int16[] bbx_center_y
+int16[] bbx_size_w
+int16[] bbx_size_h
+bool success
+string message
