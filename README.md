@@ -95,12 +95,28 @@ ros2 launch yolo_ros yolo.launch.py
 | input_rgb_topic         | INPUT_RGB_TOPIC         | `/camera/color/image_raw`   | Topic to subscribe for RGB image. Accepts `sensor_msgs/Image` |
 | input_depth_topic       | INPUT_DEPTH_TOPIC       | `/camera/depth/points`      | Topic to subscribe for Depth image. Accepts `sensor_msgs/PointCloud2` |
 | publish_annotated_image | PUBLISH_ANNOTATED_IMAGE | `False`                     | Whether to publish annotated image, increases callback execution time when set to `True` |
+| publish_detection_topic | PUBLISH_DETECTION_TOPIC | `True`                      | Whether to publish `yolo_ros_msgs/Detections` messages on the detailed detection topic |
 | rgb_topic               | RGB_TOPIC               | `/yolo_ros/rgb_image`       | Topic for publishing synchronized rgb images. uses `sensor_msgs/Image` |
 | depth_topic             | DEPTH_TOPIC             | `/yolo_ros/depth_image`     | Topic for publishing synchronized depth images. uses `sensor_msgs/PointCloud2` |
 | annotated_topic         | ANNOTATED_TOPIC         | `/yolo_ros/annotated_image` | Topic for publishing annotated images uses `sensor_msgs/Image` |
 | detailed_topic          | DETAILED_TOPIC          | `/yolo_ros/detection_result`| Topic for publishing detailed results uses `yolo_ros_msgs/Detections` |
 | threshold               | THRESHOLD               | `0.25`                      | Confidence threshold for predictions |
 | device                  | DEVICE                  | `'0'`                       | `cpu` for CPU, `0` for gpu, `0,1,2,3` if there are multiple GPUs |
+
+## Service interface
+
+The node also exposes a thin cached 2D detection service:
+
+- Service name: `/yolo_ros/get_latest_detections`
+- Service type: `yolo_ros_msgs/srv/GetLatestDetections`
+
+Example:
+
+```bash
+ros2 service call /yolo_ros/get_latest_detections yolo_ros_msgs/srv/GetLatestDetections "{}"
+```
+
+The response returns the latest cached header, full class list, detection ids, class ids, class names, confidences, and 2D bounding boxes.
 
 [1] If the model is available at [ultralytics models](https://docs.ultralytics.com/models/), It will be downloaded from the cloud at the startup. We are using docker volumes to maintain downloaded weights so that weights are not downloaded at each startup.
 
