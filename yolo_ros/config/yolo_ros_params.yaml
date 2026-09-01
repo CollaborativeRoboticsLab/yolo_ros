@@ -6,6 +6,8 @@ yolo_ros_node:
     subscribe_depth: True
     publish_annotated_image: True
     publish_detection_topic: True
+    publish_rgb_topic: True
+    publish_depth_topic: True
     rgb_topic: "/yolo_ros/rgb_image"
     depth_topic: "/yolo_ros/depth_image"
     annotated_topic: "/yolo_ros/annotated_image"

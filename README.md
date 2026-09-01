@@ -96,6 +96,8 @@ ros2 launch yolo_ros yolo.launch.py
 | input_depth_topic       | INPUT_DEPTH_TOPIC       | `/camera/depth/points`      | Topic to subscribe for Depth image. Accepts `sensor_msgs/PointCloud2` |
 | publish_annotated_image | PUBLISH_ANNOTATED_IMAGE | `False`                     | Whether to publish annotated image, increases callback execution time when set to `True` |
 | publish_detection_topic | PUBLISH_DETECTION_TOPIC | `True`                      | Whether to publish `yolo_ros_msgs/Detections` messages on the detailed detection topic |
+| publish_rgb_topic       | PUBLISH_RGB_TOPIC       | `True`                      | Whether to publish synchronized RGB images on `rgb_topic` |
+| publish_depth_topic     | PUBLISH_DEPTH_TOPIC     | `True`                      | Whether to publish synchronized depth point clouds on `depth_topic` when depth subscription is enabled |
 | rgb_topic               | RGB_TOPIC               | `/yolo_ros/rgb_image`       | Topic for publishing synchronized rgb images. uses `sensor_msgs/Image` |
 | depth_topic             | DEPTH_TOPIC             | `/yolo_ros/depth_image`     | Topic for publishing synchronized depth images. uses `sensor_msgs/PointCloud2` |
 | annotated_topic         | ANNOTATED_TOPIC         | `/yolo_ros/annotated_image` | Topic for publishing annotated images uses `sensor_msgs/Image` |
@@ -116,7 +118,7 @@ Example:
 ros2 service call /yolo_ros/get_latest_detections yolo_ros_msgs/srv/GetLatestDetections "{}"
 ```
 
-The response returns the latest cached header, full class list, detection ids, class ids, class names, confidences, and 2D bounding boxes.
+The response returns the latest cached header, image width and height, full class list, detection ids, class ids, class names, confidences, and 2D bounding boxes.
 
 [1] If the model is available at [ultralytics models](https://docs.ultralytics.com/models/), It will be downloaded from the cloud at the startup. We are using docker volumes to maintain downloaded weights so that weights are not downloaded at each startup.
 

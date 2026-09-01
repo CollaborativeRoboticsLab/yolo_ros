@@ -1,6 +1,8 @@
 # Empty request: return the latest cached 2D detections.
 ---
 std_msgs/Header header
+int32 image_width
+int32 image_height
 string[] full_class_list
 bool detections
 int64[] detection_ids

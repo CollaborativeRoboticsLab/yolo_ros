@@ -26,6 +26,8 @@ class YoloROS(Node):
         self.declare_parameter("subscribe_depth",           False)
         self.declare_parameter("publish_annotated_image",   False)
         self.declare_parameter("publish_detection_topic",   True)
+        self.declare_parameter("publish_rgb_topic",         True)
+        self.declare_parameter("publish_depth_topic",       True)
         self.declare_parameter("rgb_topic",                 "/yolo_ros/rgb_image")
         self.declare_parameter("depth_topic",               "/yolo_ros/depth_image")
         self.declare_parameter("annotated_topic",           "/yolo_ros/annotated_image")
@@ -39,6 +41,8 @@ class YoloROS(Node):
         self.subscribe_depth            = self.get_parameter("subscribe_depth").get_parameter_value().bool_value
         self.publish_annotated_image    = self.get_parameter("publish_annotated_image").get_parameter_value().bool_value
         self.publish_detection_topic    = self.get_parameter("publish_detection_topic").get_parameter_value().bool_value
+        self.publish_rgb_topic          = self.get_parameter("publish_rgb_topic").get_parameter_value().bool_value
+        self.publish_depth_topic        = self.get_parameter("publish_depth_topic").get_parameter_value().bool_value
         self.rgb_topic                  = self.get_parameter("rgb_topic").get_parameter_value().string_value
         self.depth_topic                = self.get_parameter("depth_topic").get_parameter_value().string_value
         self.annotated_topic            = self.get_parameter("annotated_topic").get_parameter_value().string_value
@@ -62,15 +66,20 @@ class YoloROS(Node):
             self.synchornizer = ApproximateTimeSynchronizer([self.rgb_message_filter, self.depth_message_filter], 10, 1)
             self.synchornizer.registerCallback(self.sync_callback)
 
-            self.publisher_depth  = self.create_publisher(PointCloud2, self.depth_topic, 10)
-
         else:
             self.subscription = self.create_subscription(Image, self.input_rgb_topic, self.image_callback, qos_profile=self.subscriber_qos_profile)
 
         self.publisher_results  = None
         if self.publish_detection_topic:
             self.publisher_results = self.create_publisher(Detections, self.detailed_topic, 10)
-        self.publisher_rgb      = self.create_publisher(Image, self.rgb_topic, 10)
+
+        self.publisher_rgb = None
+        if self.publish_rgb_topic:
+            self.publisher_rgb = self.create_publisher(Image, self.rgb_topic, 10)
+
+        self.publisher_depth = None
+        if self.subscribe_depth and self.publish_depth_topic:
+            self.publisher_depth = self.create_publisher(PointCloud2, self.depth_topic, 10)
 
         self.latest_detection_ids = []
         self.latest_class_names = []
@@ -79,6 +88,8 @@ class YoloROS(Node):
         self.latest_bbx_center_y = []
         self.latest_bbx_size_w = []
         self.latest_bbx_size_h = []
+        self.latest_image_width = 0
+        self.latest_image_height = 0
 
         self.latest_detections_service = self.create_service(
             GetLatestDetections,
@@ -99,6 +110,8 @@ class YoloROS(Node):
         del request
 
         response.header = self.detection_msg.header
+        response.image_width = int(self.latest_image_width)
+        response.image_height = int(self.latest_image_height)
         response.full_class_list = list(self.detection_msg.full_class_list)
         response.detections = self.detection_msg.detections
         response.detection_ids = list(self.latest_detection_ids)
@@ -125,6 +138,8 @@ class YoloROS(Node):
         self.latest_bbx_center_y = []
         self.latest_bbx_size_w = []
         self.latest_bbx_size_h = []
+        self.latest_image_width = 0
+        self.latest_image_height = 0
 
     def _update_latest_detection_cache(self):
         self.latest_detection_ids = []
@@ -134,6 +149,8 @@ class YoloROS(Node):
         self.latest_bbx_center_y = []
         self.latest_bbx_size_w = []
         self.latest_bbx_size_h = []
+        self.latest_image_height = int(self.input_image.shape[0])
+        self.latest_image_width = int(self.input_image.shape[1])
 
         for index, (bbox, cls, conf) in enumerate(
             zip(self.result[0].boxes.xywh, self.result[0].boxes.cls, self.result[0].boxes.conf)
@@ -179,8 +196,10 @@ class YoloROS(Node):
             self._update_latest_detection_cache()
 
             self._publish_detection_results()
-            self.publisher_rgb.publish(rgb_msg)
-            self.publisher_depth.publish(depth_msg)
+            if self.publisher_rgb is not None:
+                self.publisher_rgb.publish(rgb_msg)
+            if self.publisher_depth is not None:
+                self.publisher_depth.publish(depth_msg)
 
             if self.publish_annotated_image:
                 self.output_image = self.result[0].plot(conf=True, line_width=1, font_size=1, font="Arial.ttf", labels=True, boxes=True)
@@ -231,7 +250,8 @@ class YoloROS(Node):
             self._update_latest_detection_cache()
 
             self._publish_detection_results()
-            self.publisher_rgb.publish(rgb_image)
+            if self.publisher_rgb is not None:
+                self.publisher_rgb.publish(rgb_image)
 
             if self.publish_annotated_image:
                 self.output_image = self.result[0].plot(conf=True, line_width=1, font_size=1, font="Arial.ttf", labels=True, boxes=True)
