@@ -7,7 +7,7 @@ from message_filters import ApproximateTimeSynchronizer
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 
-from sensor_msgs.msg import Image, PointCloud2
+from sensor_msgs.msg import Image
 from yolo_ros_msgs.msg import Detections
 from yolo_ros_msgs.srv import GetLatestDetections
 
@@ -22,12 +22,11 @@ class YoloROS(Node):
 
         self.declare_parameter("yolo_model",                "yolov8n.pt")
         self.declare_parameter("input_rgb_topic",           "/camera/color/image_raw")
-        self.declare_parameter("input_depth_topic",         "/camera/depth/points")
+        self.declare_parameter("input_depth_topic",         "/camera/depth/image_rect_raw")
         self.declare_parameter("subscribe_depth",           False)
         self.declare_parameter("publish_annotated_image",   False)
         self.declare_parameter("publish_detection_topic",   True)
-        self.declare_parameter("publish_rgb_topic",         True)
-        self.declare_parameter("publish_depth_topic",       True)
+        self.declare_parameter("publish_synchronized",      True)
         self.declare_parameter("rgb_topic",                 "/yolo_ros/rgb_image")
         self.declare_parameter("depth_topic",               "/yolo_ros/depth_image")
         self.declare_parameter("annotated_topic",           "/yolo_ros/annotated_image")
@@ -41,8 +40,7 @@ class YoloROS(Node):
         self.subscribe_depth            = self.get_parameter("subscribe_depth").get_parameter_value().bool_value
         self.publish_annotated_image    = self.get_parameter("publish_annotated_image").get_parameter_value().bool_value
         self.publish_detection_topic    = self.get_parameter("publish_detection_topic").get_parameter_value().bool_value
-        self.publish_rgb_topic          = self.get_parameter("publish_rgb_topic").get_parameter_value().bool_value
-        self.publish_depth_topic        = self.get_parameter("publish_depth_topic").get_parameter_value().bool_value
+        self.publish_synchronized       = self.get_parameter("publish_synchronized").get_parameter_value().bool_value
         self.rgb_topic                  = self.get_parameter("rgb_topic").get_parameter_value().string_value
         self.depth_topic                = self.get_parameter("depth_topic").get_parameter_value().string_value
         self.annotated_topic            = self.get_parameter("annotated_topic").get_parameter_value().string_value
@@ -61,7 +59,7 @@ class YoloROS(Node):
 
         if self.subscribe_depth:
             self.rgb_message_filter     = Subscriber(self, Image, self.input_rgb_topic, qos_profile=self.subscriber_qos_profile)
-            self.depth_message_filter   = Subscriber(self, PointCloud2, self.input_depth_topic, qos_profile=self.subscriber_qos_profile)
+            self.depth_message_filter   = Subscriber(self, Image, self.input_depth_topic, qos_profile=self.subscriber_qos_profile)
 
             self.synchornizer = ApproximateTimeSynchronizer([self.rgb_message_filter, self.depth_message_filter], 10, 1)
             self.synchornizer.registerCallback(self.sync_callback)
@@ -74,12 +72,12 @@ class YoloROS(Node):
             self.publisher_results = self.create_publisher(Detections, self.detailed_topic, 10)
 
         self.publisher_rgb = None
-        if self.publish_rgb_topic:
+        if self.publish_synchronized:
             self.publisher_rgb = self.create_publisher(Image, self.rgb_topic, 10)
 
         self.publisher_depth = None
-        if self.subscribe_depth and self.publish_depth_topic:
-            self.publisher_depth = self.create_publisher(PointCloud2, self.depth_topic, 10)
+        if self.subscribe_depth and self.publish_synchronized:
+            self.publisher_depth = self.create_publisher(Image, self.depth_topic, 10)
 
         self.latest_detection_ids = []
         self.latest_class_names = []

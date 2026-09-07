@@ -99,6 +99,7 @@ CMD ros2 run yolo_ros yolo_ros --ros-args -p "yolo_model:=$YOLO_MODEL" \
                                             -p "input_depth_topic:=$INPUT_DEPTH_TOPIC" \
                                             -p "subscribe_depth:=$SUBSCRIBE_DEPTH" \
                                             -p "publish_annotated_image:=$PUBLISH_ANNOTATED_IMAGE" \
+                                            -p "publish_synchronized:=$PUBLISH_SYNCHRONIZED" \
                                             -p "rgb_topic:=$RGB_TOPIC" \
                                             -p "depth_topic:=$DEPTH_TOPIC" \
                                             -p "annotated_topic:=$ANNOTATED_TOPIC" \

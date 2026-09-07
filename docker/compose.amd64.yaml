@@ -5,9 +5,10 @@ services:
       - YOLO_MODEL=yolov10x.pt
       # - YOLO_MODEL=weights/yolov9t.pt            ---> for custom weights
       - INPUT_RGB_TOPIC=/camera/color/image_raw
-      - INPUT_DEPTH_TOPIC=/camera/depth/points
+      - INPUT_DEPTH_TOPIC=/camera/depth/image_rect_raw
       - SUBSCRIBE_DEPTH=True
       - PUBLISH_ANNOTATED_IMAGE=True
+      - PUBLISH_SYNCHRONIZED=True
       - RGB_TOPIC=/yolo_ros/rgb_image
       - DEPTH_TOPIC=/yolo_ros/depth_image
       - ANNOTATED_TOPIC=/yolo_ros/annotated_image
