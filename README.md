@@ -76,6 +76,13 @@ colcon build
 ```
 ### Start the system
 
+To start the camera, run,
+
+```bash
+source ./install/setup.bash
+ros2 launch yolo_realsense d415.launch.py
+```
+
 To use the launch file, run,
 
 ```bash
