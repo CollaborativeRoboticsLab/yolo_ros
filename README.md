@@ -1,6 +1,6 @@
 # yolo_ros
 
-A ROS2 wrapper for YOLO object detection based on [Ultralytics](https://github.com/ultralytics/ultralytics) YOLO models.
+A ROS2 wrapper for YOLO object detection based on [Ultralytics](https://github.com/ultralytics/ultralytics) YOLO models.  For docker based usage, refer to the [Docker Usage](docs/docker.md) guide.
 
 ## Setup
 
